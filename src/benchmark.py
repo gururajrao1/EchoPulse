@@ -26,6 +26,7 @@ def main():
     ap.add_argument("--checkpoint", default="checkpoints/best.pt")
     ap.add_argument("--stats", default="configs/stats.json")
     ap.add_argument("--num_clips", type=int, default=5)
+    ap.add_argument("--models", nargs="*", default=["r2plus1d_18", "mc3_18", "r3d_18"])
     ap.add_argument("--out", default="results.md")
     args = ap.parse_args()
 
@@ -33,16 +34,20 @@ def main():
     code, out = run([sys.executable, "-m", "src.baseline", "--filelist", args.filelist])
     base_rows.append(("train-mean baseline", "needs FileList only", out.strip().replace("\n", " | ")))
 
-    if os.path.exists(args.checkpoint) and os.path.exists(args.filelist):
-        code, out = run([
-            sys.executable, "-m", "src.evaluate",
-            "--data_root", args.data_root, "--filelist", args.filelist,
-            "--split", args.split, "--checkpoint", args.checkpoint,
-            "--stats", args.stats, "--num_clips", str(args.num_clips),
-        ])
-        base_rows.append(("R(2+1)D (this repo)", f"multi-clip K={args.num_clips}", out.strip().replace("\n", " | ")))
-    else:
-        base_rows.append(("R(2+1)D (this repo)", "NOT RUN — missing checkpoint/data", ""))
+    for model in args.models:
+        ckpt = args.checkpoint if len(args.models) == 1 else os.path.join(
+            os.path.dirname(args.checkpoint), f"{model}.pt")
+        if os.path.exists(ckpt) and os.path.exists(args.filelist):
+            code, out = run([
+                sys.executable, "-m", "src.evaluate",
+                "--data_root", args.data_root, "--filelist", args.filelist,
+                "--split", args.split, "--checkpoint", ckpt,
+                "--stats", args.stats, "--num_clips", str(args.num_clips),
+                "--model", model,
+            ])
+            base_rows.append((model, f"multi-clip K={args.num_clips}", out.strip().replace("\n", " | ")))
+        else:
+            base_rows.append((model, "NOT RUN — missing checkpoint/data", ""))
 
     lines = [
         "# EchoPulse benchmark",

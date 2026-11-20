@@ -1,11 +1,24 @@
-"""R(2+1)D-18 EF regressor: Kinetics-400 backbone, fc -> 1 scalar (percent 0-100)."""
+"""Video EF regressors: Kinetics-400 backbones, fc -> 1 scalar (percent 0-100)."""
 import torch.nn as nn
-from torchvision.models.video import r2plus1d_18, R2Plus1D_18_Weights
+from torchvision.models.video import (
+    MC3_18_Weights,
+    R2Plus1D_18_Weights,
+    R3D_18_Weights,
+    mc3_18,
+    r2plus1d_18,
+    r3d_18,
+)
+
+BACKBONES = {
+    "r2plus1d_18": (r2plus1d_18, R2Plus1D_18_Weights.KINETICS400_V1),
+    "mc3_18": (mc3_18, MC3_18_Weights.KINETICS400_V1),
+    "r3d_18": (r3d_18, R3D_18_Weights.KINETICS400_V1),
+}
 
 
-def build_model(pretrained=True, dropout=0.0):
-    weights = R2Plus1D_18_Weights.KINETICS400_V1 if pretrained else None
-    model = r2plus1d_18(weights=weights)
+def build_model(name="r2plus1d_18", pretrained=True, dropout=0.0):
+    ctor, w = BACKBONES[name]
+    model = ctor(weights=w if pretrained else None)
     in_features = model.fc.in_features  # 512
     layers = []
     if dropout and dropout > 0:

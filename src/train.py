@@ -88,6 +88,7 @@ def main():
     ap.add_argument("--batch", type=int, default=1)  # RTX 3050 4GB: per-step batch that fits (3,32,112,112)
     ap.add_argument("--accum", type=int, default=8)  # effective batch = batch*accum = 8
     ap.add_argument("--device", default="auto", choices=["auto", "cuda", "cpu"])
+    ap.add_argument("--model", default="r2plus1d_18", choices=["r2plus1d_18", "mc3_18", "r3d_18"])
     ap.add_argument("--num_workers", type=int, default=0)  # Windows + laptop GPU: 0 avoids shm/fork issues
     ap.add_argument("--epochs", type=int, default=30)
     ap.add_argument("--lr", type=float, default=1e-4)
@@ -123,7 +124,7 @@ def main():
     train_loader = DataLoader(train_ds, batch_size=args.batch, shuffle=True, num_workers=args.num_workers, pin_memory=(device == "cuda"))
     val_loader = DataLoader(val_ds, batch_size=args.batch, num_workers=args.num_workers, pin_memory=(device == "cuda"))
 
-    model = build_model().to(device)
+    model = build_model(name=args.model).to(device)
     opt = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=1e-4)
     sched = torch.optim.lr_scheduler.ReduceLROnPlateau(opt, factor=0.5, patience=3)
     loss_fn = nn.MSELoss()  # EF in percent; MAE reported as metric only

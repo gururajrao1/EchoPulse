@@ -38,6 +38,7 @@ def main():
     ap.add_argument("--checkpoint", default="checkpoints/best.pt")
     ap.add_argument("--stats", default="configs/stats.json")
     ap.add_argument("--num_clips", type=int, default=5)
+    ap.add_argument("--model", default="r2plus1d_18", choices=["r2plus1d_18", "mc3_18", "r3d_18"])
     ap.add_argument("--device", default="auto", choices=["auto", "cuda", "cpu"])
     args = ap.parse_args()
 
@@ -51,7 +52,7 @@ def main():
     device = args.device if args.device in ("cuda", "cpu") else ("cuda" if torch.cuda.is_available() else "cpu")
     if device == "cuda":
         print(f"Using GPU: {torch.cuda.get_device_name(0)} (cuda {torch.version.cuda})")
-    model = build_model(pretrained=False).to(device)
+    model = build_model(name=args.model, pretrained=False).to(device)
     model.load_state_dict(torch.load(args.checkpoint, map_location=device))
 
     df = pd.read_csv(args.filelist)
