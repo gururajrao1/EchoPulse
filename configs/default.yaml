@@ -1,0 +1,14 @@
+clip_len: 32
+stride: 2
+span: 63
+frame_size: 112
+num_clips: 5
+lr_backbone: 0.0001
+lr_fc: 0.001
+weight_decay: 0.0001
+batch: 1
+grad_accum: 8
+epochs: 30
+early_stopping_patience: 8
+seed: 0
+stats: configs/stats.json
