@@ -46,7 +46,8 @@ python -c "import torch, torchvision; print(torch.__version__, torchvision.__ver
 Computed once over training clips in [0,1] scale AFTER download; stored in `configs/stats.json`:
 
 ```powershell
-python -m src.train --compute_stats_only --data_root data --stats_out configs/stats.json
+python -m src.train --compute_stats_only --data_root data --stats configs/stats.json
+python tests/smoke.py   # synthetic end-to-end check, no download needed
 ```
 
 Until computed, `src/constants.py` holds `MEAN = [0.5, 0.5, 0.5]`, `STD = [0.5, 0.5, 0.5]` placeholders — replace with measured values and use the SAME train stats at val/test (never Kinetics stats).

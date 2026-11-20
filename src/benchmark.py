@@ -27,6 +27,7 @@ def main():
     ap.add_argument("--stats", default="configs/stats.json")
     ap.add_argument("--num_clips", type=int, default=5)
     ap.add_argument("--models", nargs="*", default=["r2plus1d_18", "mc3_18", "r3d_18"])
+    ap.add_argument("--device", default="auto", choices=["auto", "cuda", "cpu"])
     ap.add_argument("--out", default="results.md")
     args = ap.parse_args()
 
@@ -43,7 +44,7 @@ def main():
                 "--data_root", args.data_root, "--filelist", args.filelist,
                 "--split", args.split, "--checkpoint", ckpt,
                 "--stats", args.stats, "--num_clips", str(args.num_clips),
-                "--model", model,
+                "--model", model, "--device", args.device,
             ])
             base_rows.append((model, f"multi-clip K={args.num_clips}", out.strip().replace("\n", " | ")))
         else:
